@@ -1,5 +1,5 @@
 from collections import deque
-from config import WINDOW_SIZE
+from source.config import WINDOW_SIZE
 
 _request_history = deque(maxlen=WINDOW_SIZE)
 

@@ -1,6 +1,6 @@
 from kafka import KafkaProducer
 import json
-from config import KAFKA_BROKER
+from source.config import KAFKA_BROKER
 
 class MetricsProducer:
     def __init__(self):

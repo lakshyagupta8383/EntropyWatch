@@ -16,11 +16,56 @@ services:
       - zookeeper
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  spark-master:
+    image: apache/spark:3.5.8-scala2.12-java11-python3-ubuntu
+    container_name: spark-master
+    security_opt:
+      - label=disable
+    environment:
+      - HOME=/tmp
+      - SPARK_USER=spark
+      - PYTHONPATH=/opt/spark/work-dir
+    command: >
+      bash -lc "python3 -m pip install -q numpy
+      && mkdir -p /tmp/.ivy2/cache /tmp/.ivy2/jars
+      && /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master"
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    depends_on:
+      - kafka
+    volumes:
+      - ./:/opt/spark/work-dir
+
+  spark-worker:
+    image: apache/spark:3.5.8-scala2.12-java11-python3-ubuntu
+    container_name: spark-worker
+    security_opt:
+      - label=disable
+    environment:
+      - HOME=/tmp
+      - SPARK_USER=spark
+      - PYTHONPATH=/opt/spark/work-dir
+    command: >
+      bash -lc "python3 -m pip install -q numpy
+      && /opt/spark/bin/spark-class
+      org.apache.spark.deploy.worker.Worker
+      spark://spark-master:7077"
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./:/opt/spark/work-dir

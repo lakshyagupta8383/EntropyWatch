@@ -1,6 +1,6 @@
 import time
 import requests
-from config import API_URL
+from source.config import API_URL
 
 def collect_latency():
     start = time.time()

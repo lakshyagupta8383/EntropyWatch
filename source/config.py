@@ -1,6 +1,6 @@
 # config.py
 
-KAFKA_BROKER = "localhost:9092"
+KAFKA_BROKER = "localhost:29092"
 KAFKA_TOPIC = "system-metrics"
 
 API_URL = "http://localhost:8000/health"
