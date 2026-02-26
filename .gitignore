@@ -4,3 +4,12 @@ __pycache__/
 *.pyo
 *.pyd
 .env
+Entropy_Early_Warning_Dashboard_Design.pdf
+Review1_Final_Faculty_Compliant.pdf
+diagram.*
+*.drawio
+*.drawio.png
+--bootstrap-server
+--partitions
+--replication-factor
+--topic
