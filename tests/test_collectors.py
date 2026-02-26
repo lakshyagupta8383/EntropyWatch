@@ -57,11 +57,12 @@ class TestErrorTracker(unittest.TestCase):
         self.assertAlmostEqual(error_tracker.get_error_rate(), 1 / 3)
 
     def test_window_size_respected(self):
-        for code in [500, 500, 200, 200]:
-            error_tracker.update_error_rate(code)
+        for _ in range(config.WINDOW_SIZE):
+            error_tracker.update_error_rate(200)
+        error_tracker.update_error_rate(500)
 
-        # WINDOW_SIZE=3 so only the last 3 values are kept: 500, 200, 200
-        self.assertAlmostEqual(error_tracker.get_error_rate(), 1 / 3)
+        # Only last WINDOW_SIZE values are kept, with exactly one failure.
+        self.assertAlmostEqual(error_tracker.get_error_rate(), 1 / config.WINDOW_SIZE)
 
 
 class TestDiskIOCollector(unittest.TestCase):
